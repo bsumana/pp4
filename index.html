@@ -1,0 +1,86 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<title>Study Planner</title>
+<style>
+  body {font-family: Arial, sans-serif; margin: 2rem;}
+  h1 {margin-bottom: 0.5rem;}
+  form {margin-bottom: 1.5rem;}
+  label {display: block; margin-top: 0.5rem;}
+  input, select {padding: 0.3rem; margin-top: 0.2rem; width: 200px;}
+  button {margin-top: 0.8rem; padding: 0.4rem 0.8rem;}
+  table {border-collapse: collapse; width: 100%; max-width: 600px;}
+  th, td {border: 1px solid #ccc; padding: 0.5rem; text-align: left;}
+  th {background: #f0f0f0;}
+  .total {font-weight: bold; margin-top: 1rem;}
+</style>
+</head>
+<body>
+<h1>Study Planner</h1>
+<form id="subjectForm">
+  <label>
+    Subject:
+    <input type="text" id="subjectName" required />
+  </label>
+  <label>
+    Priority:
+    <select id="priority" required>
+      <option value="High">High</option>
+      <option value="Medium">Medium</option>
+      <option value="Low">Low</option>
+    </select>
+  </label>
+  <label>
+    Time Needed (hours):
+    <input type="number" id="timeNeeded" min="0" step="0.1" required />
+  </label>
+  <button type="submit">Add</button>
+</form>
+
+<table id="planTable">
+  <thead>
+    <tr><th>Subject</th><th>Priority</th><th>Hours</th></tr>
+  </thead>
+  <tbody></tbody>
+</table>
+<div class="total" id="totalHours">Total Hours: 0</div>
+
+<script>
+  const form = document.getElementById('subjectForm');
+  const tbody = document.querySelector('#planTable tbody');
+  const totalDiv = document.getElementById('totalHours');
+
+  // store items
+  const items = [];
+
+  const priorityOrder = { 'High': 1, 'Medium': 2, 'Low': 3 };
+
+  function render() {
+    // sort by priority order, then by insertion order
+    const sorted = [...items].sort((a, b) => priorityOrder[a.priority] - priorityOrder[b.priority]);
+    // clear table
+    tbody.innerHTML = '';
+    let total = 0;
+    for (const it of sorted) {
+      const tr = document.createElement('tr');
+      tr.innerHTML = `<td>${it.subject}</td><td>${it.priority}</td><td>${it.time}</td>`;
+      tbody.appendChild(tr);
+      total += parseFloat(it.time);
+    }
+    totalDiv.textContent = `Total Hours: ${total}`;
+  }
+
+  form.addEventListener('submit', e => {
+    e.preventDefault();
+    const subject = document.getElementById('subjectName').value.trim();
+    const priority = document.getElementById('priority').value;
+    const time = document.getElementById('timeNeeded').value;
+    if (!subject) return;
+    items.push({ subject, priority, time });
+    form.reset();
+    render();
+  });
+</script>
+</body>
+</html>
